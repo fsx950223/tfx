@@ -42,6 +42,22 @@ class TelemetryUtilsTest(tf.test.TestCase):
         'tfx_version=%s' % version.__version__.replace('.', '-'),
     ], beam_pipeline_args)
 
+  def testAddLabels(self):
+    """Test for add_labels."""
+    tfx_executor = 'tfx_executor'
+    orig_labels = telemetry_utils.get_labels_dict(tfx_executor)
+    with telemetry_utils.add_labels({'foo': 'bar'}):
+      self.assertDictEqual(
+          telemetry_utils.get_labels_dict(tfx_executor),
+          dict({'foo': 'bar'}, **orig_labels))
+      with telemetry_utils.add_labels({'inner': 'baz'}):
+        self.assertDictEqual(
+            telemetry_utils.get_labels_dict(tfx_executor),
+            dict({
+                'foo': 'bar',
+                'inner': 'baz'
+            }, **orig_labels))
+
 
 if __name__ == '__main__':
   tf.test.main()

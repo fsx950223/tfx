@@ -9,8 +9,9 @@
     latest model that was blessed by model validator.
 
 ## Bug fixes and other changes
-* Added --skaffold_cmd flag when updating a pipeline for kubeflow in CLI.
-* Changed python_version to 3.7 when using TF 1.15 and later for Cloud AI Platform Prediction.
+*   Added --skaffold_cmd flag when updating a pipeline for kubeflow in CLI.
+*   Changed python_version to 3.7 when using TF 1.15 and later for Cloud AI Platform Prediction.
+*   Added 'tfx_runner' label for cloud AI jobs from kfp/airflow/beam runner.
 
 ### Deprecations
 

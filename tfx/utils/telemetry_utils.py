@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import contextlib
 import re
 import sys
 from typing import Dict, List, Text
@@ -25,9 +26,24 @@ from typing import Dict, List, Text
 from tfx import version
 
 # Common label names used.
+TFX_RUNNER = 'tfx_runner'
 _TFX_EXECUTOR = 'tfx_executor'
 _TFX_VERSION = 'tfx_version'
 _TFX_PY_VERSION = 'tfx_py_version'
+
+# A list of global labels registered so far.
+_labels = {}
+
+
+@contextlib.contextmanager
+def add_labels(labels: Dict[Text, Text]):
+  for key, value in labels.items():
+    _labels[key] = _normalize_label(value)
+  try:
+    yield
+  finally:
+    for key in labels:
+      _labels.pop(key)
 
 
 def _normalize_label(value: Text) -> Text:
@@ -45,14 +61,15 @@ def get_labels_dict(tfx_executor: Text) -> Dict[Text, Text]:
   Returns:
     All registered and system generated labels as a dict.
   """
-  result = dict({
-      _TFX_VERSION:
-          version.__version__,
-      _TFX_PY_VERSION:
-          '%d.%d' % (sys.version_info.major, sys.version_info.minor),
-      _TFX_EXECUTOR:
-          tfx_executor,
-  })
+  result = dict(
+      {
+          _TFX_VERSION:
+              version.__version__,
+          _TFX_PY_VERSION:
+              '%d.%d' % (sys.version_info.major, sys.version_info.minor),
+          _TFX_EXECUTOR:
+              tfx_executor,
+      }, **_labels)
   for k, v in result.items():
     result[k] = _normalize_label(v)
   return result
